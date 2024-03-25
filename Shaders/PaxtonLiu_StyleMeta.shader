@@ -1,8 +1,6 @@
 //*********
 //风格化金属Shader
 //*********
-//*********
-//*********
 
 Shader "PaxtonLiu/MetallicPBRStyle"
 {
