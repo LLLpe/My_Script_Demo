@@ -1,0 +1,51 @@
+#define MAX_STEPS 100
+#define MAX_DIST 100.
+#define SURF_DIST 0.01
+
+float Getdist(vec3 p){
+    //定义一个sphere
+    vec4 sphere1 = vec4(0,1,6,1);
+    
+    float disShpere = length(p-sphere1.xyz)-sphere1.w;
+    float disPlane = p.y ;
+    
+    float dis = min(disShpere,disPlane);
+   
+    return dis;
+}
+
+float RayMarch(vec3 pos,vec3 dir){
+    //光线目前步进了多少
+    float dis0 = 0.;
+    
+    for(int i=0; i<MAX_STEPS; i++){
+        vec3 p = pos + dis0*dir;
+        
+        //目前步进位置与附近表面的距离，如果該值小于最小距离，就认为已经与表面相交了
+        float dis = Getdist(p);
+        dis0+= dis;
+        if(dis0 > MAX_DIST || dis <SURF_DIST) break;
+    }
+    return dis0;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = (fragCoord-0.5*iResolution.xy)/iResolution.y;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+    
+    
+    //相机设置
+    vec3 posCam = vec3(0,1,0);
+    vec3 dirCam = normalize(vec3(uv.x,uv.y,1));
+    float rayMarchCol = RayMarch(posCam, dirCam);
+    rayMarchCol /= 8.;
+    vec4 finalCol = vec4(1.);
+    finalCol.xyz = vec3(rayMarchCol);
+    
+    // Output to screen
+    fragColor = finalCol;
+}
